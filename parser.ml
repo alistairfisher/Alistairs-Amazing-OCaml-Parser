@@ -16,29 +16,24 @@ let member element elements =
   let eq x = (x = element) in
   List.exists eq elements
   
+let index element elements =
+  let rec helper x (y::ys) n =
+    if x = y then n
+    else helper x ys (n+1)
+  in helper element elements 0
+  
 let int_of_string_option s =
   try
     Some (int_of_string s)
   with
     Failure _ -> None
-    
-let numbers_in_line l =
-  let rec helper = function
-  [] -> []
-  |x::xs ->
-    match int_of_string_option x with
-    Some v -> v::(helper xs)
-    |None -> helper xs
-  in
-  let line_list = split_words l in
-  helper line_list
   
 let check_line s =
   let line_list = split_words s in
   if
     (member "expects" line_list) && (member "generates" line_list) then
-      let numbers = numbers_in_line s in
-      (List.nth numbers 0) > (List.nth numbers 1)
+      (int_of_string(List.nth line_list ((index "expects" line_list)+1)))
+      > (int_of_string(List.nth line_list ((index "generates" line_list)+1)))
   else false
   
 let rec readline ic oc =
